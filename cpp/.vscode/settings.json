@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.tex": "tex",
+        "unordered_map": "cpp",
+        "vector": "cpp"
+    }
+}
