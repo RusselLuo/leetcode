@@ -9,32 +9,32 @@ class Solution {
   public:
     int ladderLength(string beginWord, string endWord,
                      vector<string> &wordList) {
-        queue<string> q;
+        queue<int> q;
         wordList.push_back(beginWord);
-        unordered_map<string, int> dist;
-        unordered_set<string> visited;
-        unordered_map<string, vector<string>> g;
-        buildGraph(dist, g, wordList);
-        q.push(beginWord);
-        dist[beginWord] = 0;
-        dist[endWord] = -1;
-        visited.insert(beginWord);
+        vector<int> dist(wordList.size(), -1);
+        unordered_set<int> visited;
+        unordered_map<int, vector<int>> g;
+        if (!buildGraph(dist, g, wordList, endWord))
+            return -1;
+        q.push(wordList.size() - 1);
+        dist[wordList.size() - 1] = 0;
+        visited.insert(wordList.size() - 1);
         while (!q.empty()) {
-            string &curr = q.front();
-            if (curr == endWord) {
+            int curr = q.front();
+            if (wordList[curr] == endWord) {
                 return dist[curr] + 1;
             }
             q.pop();
             for (auto i : g[curr]) {
                 if (visited.find(i) == visited.end()) {
                     visited.insert(i);
-                    // cout<<i<<" : "<<dist[curr]+1;
+                    // cout << i << " : " << dist[curr] + 1;
                     dist[i] = dist[curr] + 1;
                     q.push(i);
                 }
             }
         }
-        return dist[endWord];
+        return -1;
     }
     int dis(string a, string b) {
         int count = 0;
@@ -45,21 +45,32 @@ class Solution {
         return count;
     }
 
-    void buildGraph(unordered_map<string, int> &dist,
-                    unordered_map<string, vector<string>> &g,
-                    vector<string> &wordList) {
+    bool buildGraph(vector<int> &dist, unordered_map<int, vector<int>> &g,
+                    vector<string> &wordList, string endWord) {
+        bool possible = false;
         for (int i = 0; i < wordList.size(); ++i) {
             auto s1 = wordList[i];
-            dist[s1] = -1;
+            // cout << s1 << endl;
+            if (s1 == endWord) {
+                possible = true;
+            }
+            if (g.find(i) == g.end()) {
+                g[i] = vector<int>();
+            }
             for (int j = i; j < wordList.size(); ++j) {
                 auto s2 = wordList[j];
                 int distance = dis(s1, s2);
+                // cout << s2 << endl;
                 if (distance == 1) {
-                    g[s1].push_back(s2);
-                    g[s2].push_back(s1);
+                    if (g.find(j) == g.end()) {
+                        g[j] = vector<int>();
+                    }
+                    g[i].push_back(j);
+                    g[j].push_back(i);
                 }
             }
         }
+        return possible;
     }
 };
 
