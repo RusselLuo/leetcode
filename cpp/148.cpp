@@ -5,56 +5,57 @@ struct ListNode {
 };
 
 class Solution {
-  public:
-    ListNode *sortList(ListNode *head) {
-        if (!head || !head->next)
+public:
+    ListNode* sortList(ListNode* head) {
+        if(!head||!head->next){
             return head;
+        }
         ListNode *mid = head->next;
-        if (!mid->next) {
-            if (head->val > mid->val) {
+        ListNode *end = head->next->next;
+        if(!end){
+            if(head->val>mid->val){
                 mid->next = head;
                 head->next = nullptr;
                 return mid;
             }
             return head;
         }
-        ListNode *end = head->next->next;
-        while (end && end->next) {
+        //iterate the linked list, make end step twice faster than mid
+        while(end&&end->next){
             mid = mid->next;
             end = end->next->next;
         }
-        auto *secondHead = mid->next;
+        ListNode *secondHead = mid->next;
         mid->next = nullptr;
-        // cout<<secondHead->val<<endl;
-        return merge(sortList(head), sortList(secondHead));
+        return merge(sortList(head),sortList(secondHead));
     }
-    ListNode *merge(ListNode *head, ListNode *mid) {
+    ListNode* merge(ListNode *first, ListNode *second){
         ListNode *merged = nullptr;
-        ListNode *curr = nullptr;
-        // cout<<head->val<<","<<mid->val;
-        while (head && mid) {
-            if (head->val < mid->val) {
-                if (!merged) {
-                    curr = merged = head;
-                } else {
-                    curr->next = head;
+        ListNode *curr = merged;
+        //iterate both sorted linked list, append the smaller node to the merged linked list.
+        while(second&&first){
+            if(first->val<second->val){
+                if(!merged){
+                    curr = merged = first;
+                }else{
+                    curr->next = first;
                     curr = curr->next;
                 }
-                head = head->next;
-            } else {
-                if (!merged) {
-                    curr = merged = mid;
-                } else {
-                    curr->next = mid;
+                first = first->next;
+            }else{
+                if(!merged){
+                    curr = merged = second;
+                }else{
+                    curr->next = second;
                     curr = curr->next;
                 }
-                mid = mid->next;
+                second = second->next;
             }
         }
-        if (!head) {
-            curr->next = mid;
-        } else if (!mid) {
-            curr->next = head;
+        if(!first){
+            curr->next = second;
+        }else{
+            curr->next = first;
         }
         return merged;
     }
